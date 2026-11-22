@@ -1,4 +1,4 @@
-/*! @veyforma/charts v1.0.1 · MIT License · Copyright (c) 2026 Veyforma · https://github.com/veyforma/veyforma-charts */
+/*! @veyforma/charts v1.0.2 · MIT License · Copyright (c) 2026 Veyforma · https://github.com/veyforma/veyforma-charts */
 /*!
  * Veyforma Exposure Heatmap v1.2.0
  * A dependency-free heatmap that reveals concentrations, for example
@@ -2934,7 +2934,7 @@
   }
 
   root.VeyformaCharts = {
-    version: "1.0.1",
+    version: "1.0.2",
     /** Exposure heatmap: concentrations by any two fields, e.g. sector × country. */
     heatmap: function (target, options) { return need("VeyHeatmap").create(target, options); },
     /** Risk-factor tornado: down and up impact per factor, with convexity, limits and hedges. */

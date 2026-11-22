@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.0.1 – 2026-11-22
+## 1.0.2 – 2026-11-22
+
+- Repository link in package.json matches the GitHub account name (needed for provenance)
+- npm homepage now opens the live demos
+- Releases are published from GitHub Actions with npm trusted publishing
+
+## 1.0.1 – 2026-11-22 (not published)
 
 - npm homepage now opens the live demos
 - Releases are published from GitHub Actions with npm trusted publishing
