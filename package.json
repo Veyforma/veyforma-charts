@@ -1,0 +1,53 @@
+{
+  "name": "@veyforma/charts",
+  "version": "1.0.0",
+  "description": "Zero-dependency JavaScript charts for finance and risk: exposure heatmap, risk-factor tornado and P&L attribution.",
+  "keywords": [
+    "charts",
+    "data-visualization",
+    "heatmap",
+    "tornado-chart",
+    "sensitivity-analysis",
+    "finance",
+    "risk-management",
+    "credit-risk",
+    "market-risk",
+    "frtb",
+    "svg",
+    "zero-dependency",
+    "accessible"
+  ],
+  "homepage": "https://github.com/veyforma/veyforma-charts#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/veyforma/veyforma-charts.git"
+  },
+  "bugs": "https://github.com/veyforma/veyforma-charts/issues",
+  "license": "MIT",
+  "author": "Veyforma (https://www.veyforma.com)",
+  "type": "module",
+  "main": "./dist/veyforma-charts.cjs",
+  "module": "./dist/veyforma-charts.mjs",
+  "unpkg": "./dist/veyforma-charts.min.js",
+  "jsdelivr": "./dist/veyforma-charts.min.js",
+  "exports": {
+    ".": {
+      "import": "./dist/veyforma-charts.mjs",
+      "require": "./dist/veyforma-charts.cjs"
+    },
+    "./dist/*": "./dist/*"
+  },
+  "files": [
+    "dist",
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

@@ -1,0 +1,143 @@
+/*!
+ * Sample data for the Veyforma Charts examples.
+ * Every name and figure is invented for illustration ("Illustrative sample data").
+ * Generated from fixed seeds, so every load gives the same figures.
+ * MIT License. Copyright (c) 2026 Veyforma.
+ */
+(function (root) {
+  "use strict";
+
+  // Small seeded random number generator (mulberry32) and a normal draw.
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function normal(r) { var u = 0, v = 0; while (u === 0) u = r(); while (v === 0) v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+  function pick(r, weights) { var x = r() * weights.total, i = 0; while (x > weights.cum[i]) i++; return i; }
+  function cumulate(w) { var cum = [], s = 0; w.forEach(function (v) { s += v; cum.push(s); }); return { cum: cum, total: s }; }
+  function round(v, d) { var k = Math.pow(10, d); return Math.round(v * k) / k; }
+
+  /* ------------------------------------------------------------------
+     1. Exposure heatmap: a fictional bank's corporate loan book.
+     ------------------------------------------------------------------ */
+  var SECTORS = ["Commercial real estate", "Energy", "Utilities", "Manufacturing", "Retail", "Technology", "Transport", "Healthcare", "Agriculture", "Financial services"];
+  var SECTOR_W = [17, 10, 8, 14, 9, 11, 7, 8, 4, 12];
+  var COUNTRIES = ["United Kingdom", "Germany", "France", "Netherlands", "Spain", "Italy", "United States", "Poland"];
+  var COUNTRY_W = [24, 17, 13, 9, 8, 7, 16, 6];
+  var RATINGS = ["AAA", "AA", "A", "BBB", "BB", "B", "CCC"];
+  var RATING_W = [3, 9, 22, 34, 20, 9, 3];
+
+  // Loan-level records: { sector, country, rating, value } in USD m.
+  // A deliberate hot spot: UK commercial real estate carries extra weight.
+  function loanRecords(n, seed) {
+    var r = rng(seed || 7), s = cumulate(SECTOR_W), c = cumulate(COUNTRY_W), g = cumulate(RATING_W);
+    var scale = 4200 / n * 1.0, out = new Array(n);
+    for (var i = 0; i < n; i++) {
+      var si = pick(r, s), ci = pick(r, c), gi = pick(r, g);
+      var v = Math.exp(0.9 * normal(r)) * scale;
+      if (si === 0 && ci === 0) v *= 3.2;           // concentration: UK CRE
+      if (si === 1 && ci === 6) v *= 1.8;           // US energy
+      out[i] = { sector: SECTORS[si], country: COUNTRIES[ci], rating: RATINGS[gi], value: v };
+    }
+    return out;
+  }
+
+  var heatmap = {
+    title: "Corporate loan exposure by sector",
+    subtitle: "Fictional European bank, USD m",
+    prefix: "$", suffix: "m", decimals: 0,
+    records: loanRecords(6000, 7),
+    rows: "sector", columns: "country",
+    dimensions: {
+      sector: { label: "Sector" },
+      country: { label: "Country" },
+      rating: { label: "Rating", order: RATINGS, ordered: true }
+    },
+    limit: { share: 0.08 }
+  };
+
+  /* ------------------------------------------------------------------
+     2. Risk-factor tornado: a fictional multi-asset macro book.
+     ------------------------------------------------------------------ */
+  function t(label, group, unit, shock, delta, gamma) { return { key: label, label: label, group: group, unit: unit, shock: shock, delta: delta, gamma: gamma || 0 }; }
+  function rv(label, group, unit, shock, down, up) { return { key: label, label: label, group: group, unit: unit, shockDown: -shock, shockUp: shock, down: down, up: up }; }
+  var factors = [
+    t("USD 10Y rate", "Rates", "bp", 25, -0.064, 0.0006),
+    t("EUR 10Y rate", "Rates", "bp", 25, 0.041, 0.0003),
+    t("USD 2Y rate", "Rates", "bp", 25, 0.022, 0),
+    t("GBP 10Y rate", "Rates", "bp", 25, -0.018, 0.0001),
+    t("S&P 500", "Equity", "%", 10, 0.142, -0.0045),
+    t("Euro Stoxx 50", "Equity", "%", 10, 0.071, -0.0021),
+    t("Nikkei 225", "Equity", "%", 10, -0.038, 0),
+    rv("VIX", "Volatility", "vol pts", 5, 0.21, -0.64),
+    rv("EUR/USD", "FX", "%", 5, -0.48, 0.39),
+    rv("USD/JPY", "FX", "%", 5, 0.27, -0.31),
+    t("Brent crude", "Commodities", "%", 20, -0.009, -0.0006),
+    t("Gold", "Commodities", "%", 10, 0.035, 0),
+    t("US IG credit spread", "Credit", "bp", 20, -0.019, 0.0002),
+    t("EUR HY credit spread", "Credit", "bp", 50, -0.006, 0.00004)
+  ];
+  function total(side) {
+    return factors.reduce(function (a, f) {
+      if (f.delta == null) return a + f[side];
+      var s = side === "down" ? -f.shock : f.shock; return a + f.delta * s + 0.5 * f.gamma * s * s;
+    }, 0);
+  }
+  var tornado = {
+    title: "P&L sensitivity – Multi-asset macro book",
+    subtitle: "±25 bp rates, ±10% equity, ±5% FX; one factor at a time",
+    unit: "USD m", prefix: "$", suffix: "m", decimals: 2,
+    asOf: "2026-10-30", limit: 1.5,
+    correlation: { within: 0.7, across: 0.25 },
+    joint: { down: round(total("down") - 0.42, 2), up: round(total("up") + 0.18, 2) },
+    factors: factors
+  };
+
+  /* ------------------------------------------------------------------
+     3. P&L attribution: a fictional credit trading desk, 260 days.
+     ------------------------------------------------------------------ */
+  var DATES = (function () {
+    var out = [], d = new Date(Date.UTC(2026, 9, 30));
+    while (out.length < 260) { var w = d.getUTCDay(); if (w !== 0 && w !== 6) out.unshift(d.toISOString().slice(0, 10)); d = new Date(d.getTime() - 86400000); }
+    return out;
+  })();
+  // model: "good" (small noise), "noise" (a proxy: extra noise), "lag" (stale prices), "missing" (not in the risk model)
+  function desk(seed, rho, spec) {
+    var r = rng(seed), n = DATES.length, m = [], i;
+    for (i = 0; i < n; i++) m.push(normal(r));
+    return spec.map(function (f) {
+      var hpl = [], rtpl = [], prev = 0;
+      for (var k = 0; k < n; k++) {
+        var s = Math.sqrt(rho) * m[k] + Math.sqrt(1 - rho) * normal(r);
+        var h = f.vol * f.sign * s, q;
+        if (f.model === "noise") q = h + f.amount * f.vol * normal(r);
+        else if (f.model === "lag") q = (1 - f.amount) * h + f.amount * prev + 0.05 * f.vol * normal(r);
+        else q = h + 0.04 * f.vol * normal(r);
+        prev = h; hpl.push(round(h, 4)); rtpl.push(round(q, 4));
+      }
+      return { key: f.label, label: f.label, group: f.group, hpl: hpl, rtpl: f.model === "missing" ? null : rtpl };
+    });
+  }
+  var pla = {
+    title: "P&L attribution – Credit trading desk",
+    subtitle: "Front-office HPL vs risk model RTPL by risk factor",
+    unit: "USD m", prefix: "$", suffix: "m", decimals: 2, asOf: "2026-10-30",
+    dates: DATES,
+    factors: desk(23, 0.4, [
+      { label: "US IG index (CDX IG)", group: "Index spreads", vol: 0.30, sign: 1 },
+      { label: "EUR IG index (iTraxx Main)", group: "Index spreads", vol: 0.24, sign: 1 },
+      { label: "US HY index (CDX HY)", group: "Index spreads", vol: 0.14, sign: -1 },
+      { label: "Single-name spreads", group: "Single names", vol: 0.24, sign: 1, model: "noise", amount: 1.8 },
+      { label: "Index-to-single-name basis", group: "Basis", vol: 0.13, sign: -1, model: "lag", amount: 0.6 },
+      { label: "UST 5Y", group: "Rates", vol: 0.10, sign: -1 },
+      { label: "UST 10Y", group: "Rates", vol: 0.12, sign: 1 },
+      { label: "Recovery rates", group: "Recovery", vol: 0.05, sign: 1, model: "missing" }
+    ])
+  };
+
+  root.VeyformaSamples = { heatmap: heatmap, loanRecords: loanRecords, tornado: tornado, pla: pla };
+})(typeof window !== "undefined" ? window : this);

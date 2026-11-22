@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Risk-Factor Tornado – Veyforma Charts</title>
+<meta name="description" content="Zero-dependency JavaScript tornado (sensitivity) chart: ranks the risk factors that move P&L the most, with convexity, loss limits and correlated contributions.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html">Heatmap</a>
+    <a href="tornado.html" aria-current="page">Tornado</a>
+    <a href="pla-attribution.html">P&amp;L attribution</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page">Risk-Factor Tornado</h1>
+  <p class="lead">Which risk factors move P&amp;L the most? Each bar shocks one factor down and up. Diamonds flag convexity (losses that grow faster than the shock), and the contribution view shows which factors drive the combined move and which hedge it.</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">Multi-asset macro book</h2>
+    <p class="sub">Fictional book · USD m · Illustrative sample data</p>
+    <div class="controls">
+      <div class="field">
+        <span class="lbl" id="vLbl">View</span>
+        <span class="seg" role="group" aria-labelledby="vLbl">
+          <button type="button" data-view="factors" aria-pressed="true">Factors</button>
+          <button type="button" data-view="groups" aria-pressed="false">Groups</button>
+          <button type="button" data-view="contribution" aria-pressed="false">Contribution</button>
+        </span>
+      </div>
+      <div class="field">
+        <label for="sort">Rank by</label>
+        <select id="sort"><option value="swing">Swing</option><option value="worst">Worst result</option></select>
+      </div>
+      <div class="field">
+        <label for="scale">Shock size</label>
+        <select id="scale"><option value="0.5">Half</option><option value="1" selected>As given</option><option value="2">Double</option></select>
+      </div>
+    </div>
+    <div id="chart"></div>
+    <div class="card-foot">
+      <span class="by">Veyforma Risk-Factor Tornado · MIT</span>
+      <span class="links"><a href="https://www.veyforma.com/charts/risk-factor-tornado">Full package with exports, what-ifs and six books</a></span>
+    </div>
+  </section>
+
+  <h3>The code</h3>
+<pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-tornado.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VeyRiskTornado.create("#chart", {
+    data: {
+      prefix: "$", suffix: "m", decimals: 2, limit: 1.5,
+      factors: [
+        // delta per unit of shock and gamma per unit², with a ±shock
+        { label: "USD 10Y rate", group: "Rates", unit: "bp", shock: 25, delta: -0.064, gamma: 0.0006 },
+        // or the results of a full revaluation after each shock
+        { label: "EUR/USD", group: "FX", unit: "%", shockDown: -5, shockUp: 5, down: -0.48, up: 0.39 }
+      ]
+    }
+  });
+&lt;/script&gt;</code></pre>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var chart = VeyRiskTornado.create("#chart", { data: VeyformaSamples.tornado, toolbar: false });
+  var buttons = document.querySelectorAll("[data-view]");
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      buttons.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      chart.setView(b.getAttribute("data-view"));
+    });
+  });
+  document.getElementById("sort").addEventListener("change", function () { chart.update({ sort: this.value }); });
+  document.getElementById("scale").addEventListener("change", function () { chart.setShockScale(+this.value); });
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veyforma Charts – zero-dependency JavaScript charts for finance and risk</title>
+<meta name="description" content="Free, MIT-licensed JavaScript charts for finance and risk teams: exposure heatmap, risk-factor tornado and FRTB P&L attribution. No dependencies, accessible, no build step.">
+<meta property="og:title" content="Veyforma Charts">
+<meta property="og:description" content="Zero-dependency JavaScript charts for finance and risk teams.">
+<meta property="og:image" content="https://veyforma.github.io/veyforma-charts/docs/hero.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html">Heatmap</a>
+    <a href="tornado.html">Tornado</a>
+    <a href="pla-attribution.html">P&amp;L attribution</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Charts for the questions risk teams actually ask</h1>
+    <p>Where is exposure concentrated? Which risk factors move P&amp;L? Why doesn't the risk model's P&amp;L match the front office's? Three free charts that answer these questions, in plain JavaScript.</p>
+    <ul class="pills">
+      <li>No dependencies</li><li>MIT license</li><li>No build step</li><li>Keyboard and screen reader</li><li>Nothing sent to a server</li>
+    </ul>
+  </section>
+
+  <pre><code>npm install @veyforma/charts</code></pre>
+
+  <section class="card" aria-labelledby="h-heat">
+    <h2 id="h-heat">Exposure Heatmap</h2>
+    <p class="sub">Credit concentration by sector and country, from loan-level records.</p>
+    <div id="heat"></div>
+    <div class="card-foot"><span class="by">VeyHeatmap.create(el, options)</span><span class="links"><a href="heatmap.html">Interactive demo (1M records)</a></span></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-tor">
+    <h2 id="h-tor">Risk-Factor Tornado</h2>
+    <p class="sub">The factors that move P&amp;L the most, with convexity and a loss limit.</p>
+    <div id="tor"></div>
+    <div class="card-foot"><span class="by">VeyRiskTornado.create(el, options)</span><span class="links"><a href="tornado.html">Interactive demo</a></span></div>
+  </section>
+
+  <section class="card" aria-labelledby="h-pla">
+    <h2 id="h-pla">P&amp;L Attribution</h2>
+    <p class="sub">The FRTB P&amp;L attribution test, factor by factor, with the path back to green.</p>
+    <div id="pla"></div>
+    <div class="card-foot"><span class="by">VeyPlaAttribution.create(el, options)</span><span class="links"><a href="pla-attribution.html">Interactive demo</a></span></div>
+  </section>
+
+  <aside class="more">
+    <p><strong>Need more?</strong> The full packages on Veyforma add a chart menu with PNG, SVG, PDF, CSV and Excel downloads, more sample data and a developer manual. Veyforma also has more risk and finance charts and complete dashboard prototypes.</p>
+    <a class="cta" href="https://www.veyforma.com">Visit veyforma.com</a>
+  </aside>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var S = window.VeyformaSamples;
+  VeyformaCharts.heatmap("#heat", { data: S.heatmap, toolbar: false });
+  VeyformaCharts.tornado("#tor", { data: S.tornado, toolbar: false, top: 10 });
+  VeyformaCharts.plaAttribution("#pla", { data: S.pla, toolbar: false });
+</script>
+</body>
+</html>

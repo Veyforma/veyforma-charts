@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exposure Heatmap – Veyforma Charts</title>
+<meta name="description" content="Zero-dependency JavaScript heatmap that shows where credit exposure is concentrated, by sector and country or rating. Aggregates loan-level records in the browser.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html" aria-current="page">Heatmap</a>
+    <a href="tornado.html">Tornado</a>
+    <a href="pla-attribution.html">P&amp;L attribution</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page">Exposure Heatmap</h1>
+  <p class="lead">Where is credit exposure concentrated? Give the chart loan-level records or a ready-made grid. It sums them in the browser, colours each cell by size and outlines every cell above your concentration limit.</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">Corporate loan exposure</h2>
+    <p class="sub">Fictional European bank · USD m · Illustrative sample data</p>
+    <div class="controls">
+      <div class="field">
+        <label for="cols">Columns</label>
+        <select id="cols"><option value="country">Country</option><option value="rating">Rating</option></select>
+      </div>
+      <div class="field">
+        <label for="mode">Show</label>
+        <select id="mode">
+          <option value="amount">Amount</option>
+          <option value="shareOfTotal">Share of total</option>
+          <option value="shareOfRow">Share of sector</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="limit">Concentration limit</label>
+        <select id="limit"><option value="0.05">5% of total</option><option value="0.08" selected>8% of total</option><option value="0.1">10% of total</option></select>
+      </div>
+      <div class="field">
+        <span class="lbl">Stress test</span>
+        <button class="btn" id="big" type="button">Load 1,000,000 loans</button>
+      </div>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite">6,000 fictional loans.</p>
+    <div id="chart"></div>
+    <div class="card-foot">
+      <span class="by">Veyforma Exposure Heatmap · MIT</span>
+      <span class="links"><a href="https://www.veyforma.com/charts/exposure-heatmap">Full package with exports and 12 industries</a></span>
+    </div>
+  </section>
+
+  <h3>The code</h3>
+<pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-heatmap.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VeyHeatmap.create("#chart", {
+    data: {
+      title: "Loan exposure by sector and country",
+      prefix: "$", suffix: "m",
+      records: loans,              // [{ sector, country, rating, value }, …]
+      rows: "sector", columns: "country",
+      limit: { share: 0.08 }       // outline cells above 8% of the total
+    }
+  });
+&lt;/script&gt;</code></pre>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var S = window.VeyformaSamples;
+  var chart = VeyHeatmap.create("#chart", { data: S.heatmap, toolbar: false });
+  var $ = function (id) { return document.getElementById(id); };
+  var statusEl = $("status");
+  var fmt = function (n) { return n.toLocaleString("en-US"); };
+
+  $("cols").addEventListener("change", function () { chart.update({ columns: this.value }); });
+  $("mode").addEventListener("change", function () { chart.update({ valueMode: this.value }); });
+  $("limit").addEventListener("change", function () { chart.update({ limit: +this.value }); });
+
+  $("big").addEventListener("click", function () {
+    var btn = this;
+    btn.disabled = true;
+    statusEl.textContent = "Generating 1,000,000 fictional loans…";
+    setTimeout(function () {
+      var g0 = performance.now();
+      var records = S.loanRecords(1000000, 11);
+      var g1 = performance.now();
+      var data = Object.assign({}, S.heatmap, { title: "Corporate loan exposure (1,000,000 loans)", records: records });
+      var d0 = performance.now();
+      chart.update({ data: data });
+      var d1 = performance.now();
+      statusEl.innerHTML = "<strong>1,000,000 loans summed and drawn in " + fmt(Math.round(d1 - d0)) + " ms</strong> in your browser" +
+        " (generating the sample took " + fmt(Math.round(g1 - g0)) + " ms). Switch the columns: the sums are cached.";
+      btn.textContent = "Loaded";
+    }, 30);
+  });
+</script>
+</body>
+</html>

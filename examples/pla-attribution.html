@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>P&amp;L Attribution (FRTB PLA test) – Veyforma Charts</title>
+<meta name="description" content="Zero-dependency JavaScript chart for the FRTB P&L attribution test: HPL vs RTPL by risk factor, Spearman and KS zones, and the shortest path of fixes to green.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html">Heatmap</a>
+    <a href="tornado.html">Tornado</a>
+    <a href="pla-attribution.html" aria-current="page">P&amp;L attribution</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page">P&amp;L Attribution</h1>
+  <p class="lead">Why does the risk model's P&amp;L differ from the front office's? The chart runs the FRTB P&amp;L attribution test (Spearman correlation and Kolmogorov–Smirnov over 250 days), shows each factor's share of the unexplained P&amp;L, and finds the shortest path of fixes back to the green zone.</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">Credit trading desk</h2>
+    <p class="sub">Fictional desk · 260 business days · USD m · Illustrative sample data</p>
+    <div class="controls">
+      <div class="field">
+        <span class="lbl" id="vLbl">View</span>
+        <span class="seg" role="group" aria-labelledby="vLbl">
+          <button type="button" data-view="factors" aria-pressed="true">Factors</button>
+          <button type="button" data-view="daily" aria-pressed="false">Daily</button>
+          <button type="button" data-view="distribution" aria-pressed="false">Distribution</button>
+        </span>
+      </div>
+      <div class="field">
+        <label for="win">Test window</label>
+        <select id="win"><option value="250" selected>250 days</option><option value="120">120 days</option><option value="60">60 days</option></select>
+      </div>
+      <div class="field">
+        <span class="lbl">What if</span>
+        <label class="check"><input type="checkbox" id="fix"> Model single-name spreads properly</label>
+      </div>
+    </div>
+    <div id="chart"></div>
+    <div class="card-foot">
+      <span class="by">Veyforma P&amp;L Attribution · MIT</span>
+      <span class="links"><a href="https://www.veyforma.com/charts/pnl-attribution">Full package with exports and six desks</a></span>
+    </div>
+  </section>
+
+  <h3>The code</h3>
+<pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-pla.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VeyPlaAttribution.create("#chart", {
+    window: 250,
+    data: {
+      prefix: "$", suffix: "m", decimals: 2,
+      dates: dates,                                  // one per business day
+      factors: [
+        { label: "CDX IG", hpl: [/* … */], rtpl: [/* … */] },
+        { label: "Recovery rates", hpl: [/* … */] }   // not in the risk model: leave rtpl out
+      ]
+    }
+  });
+&lt;/script&gt;</code></pre>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var chart = VeyPlaAttribution.create("#chart", { data: VeyformaSamples.pla, toolbar: false });
+  var buttons = document.querySelectorAll("[data-view]");
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      buttons.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      chart.setView(b.getAttribute("data-view"));
+    });
+  });
+  document.getElementById("win").addEventListener("change", function () { chart.setWindow(+this.value); });
+  document.getElementById("fix").addEventListener("change", function () { chart.setFix(this.checked ? ["Single-name spreads"] : null); });
+</script>
+</body>
+</html>
