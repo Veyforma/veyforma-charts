@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.0 – 2026-11-22
+
+- New chart: Debt Maturity Ladder (engine v1.0.0), with a live demo
+- `VeyformaCharts.debtLadder(el, options)`
+
 ## 1.0.2 – 2026-11-22
 
 - Repository link in package.json matches the GitHub account name (needed for provenance)

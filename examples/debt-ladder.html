@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Debt Maturity Ladder – Veyforma Charts</title>
+<meta name="description" content="Zero-dependency JavaScript debt maturity ladder: maturities by year or quarter, refinancing walls, start-by dates, liquidity cover and weighted average maturity.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html">Heatmap</a>
+    <a href="tornado.html">Tornado</a>
+    <a href="pla-attribution.html">P&amp;L attribution</a>
+    <a href="debt-ladder.html" aria-current="page">Debt ladder</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page">Debt Maturity Ladder</h1>
+  <p class="lead">When does our debt fall due, and can we cover it? The chart builds the maturity profile from your facilities, flags refinancing walls, shows when each refinancing should start, and compares what's due with cash and undrawn committed lines.</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">Aldermoor Logistics</h2>
+    <p class="sub">Fictional company · EUR m · Illustrative sample data</p>
+    <div class="controls">
+      <div class="field">
+        <span class="lbl" id="vLbl">View</span>
+        <span class="seg" role="group" aria-labelledby="vLbl">
+          <button type="button" data-view="ladder" aria-pressed="true">Ladder</button>
+          <button type="button" data-view="facilities" aria-pressed="false">Facilities</button>
+          <button type="button" data-view="coverage" aria-pressed="false">Coverage</button>
+        </span>
+      </div>
+      <div class="field">
+        <label for="period">By</label>
+        <select id="period"><option value="year">Year</option><option value="quarter">Quarter</option></select>
+      </div>
+      <div class="field">
+        <span class="lbl">Options</span>
+        <label class="check"><input type="checkbox" id="ext"> Exercise extension options</label>
+      </div>
+      <div class="field">
+        <span class="lbl">What if</span>
+        <label class="check"><input type="checkbox" id="whatif"> Refinance Bond 2028 into 2033</label>
+      </div>
+    </div>
+    <div id="chart"></div>
+    <div class="card-foot">
+      <span class="by">Veyforma Debt Maturity Ladder · MIT</span>
+      <span class="links"><a href="https://www.veyforma.com/charts/debt-maturity-ladder">Full package with exports and six borrowers</a></span>
+    </div>
+  </section>
+
+  <h3>The code</h3>
+<pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-debtladder.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VeyDebtLadder.create("#chart", {
+    data: {
+      asOf: "2026-10-31", prefix: "€", suffix: "m", cash: 120,
+      facilities: [
+        { name: "Term loan A", type: "Term loan", amount: 180, maturity: "2028-03-31" },
+        { name: "Bond 2028", type: "Bond", amount: 350, maturity: "2028-06-15" },
+        { name: "Revolver", type: "Revolver", amount: 45, limit: 300, maturity: "2029-09-30" }
+      ]
+    }
+  });
+&lt;/script&gt;</code></pre>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var chart = VeyDebtLadder.create("#chart", { data: VeyformaSamples.debtLadder, toolbar: false });
+  var buttons = document.querySelectorAll("[data-view]");
+  buttons.forEach(function (b) {
+    b.addEventListener("click", function () {
+      buttons.forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+      chart.setView(b.getAttribute("data-view"));
+    });
+  });
+  document.getElementById("period").addEventListener("change", function () { chart.setPeriod(this.value); });
+  document.getElementById("ext").addEventListener("change", function () { chart.setExtensions(this.checked); });
+  document.getElementById("whatif").addEventListener("change", function () {
+    chart.setWhatIf(this.checked ? [{ facility: "Bond 2028", maturity: "2033-06-15" }] : null);
+  });
+</script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 {
   "name": "@veyforma/charts",
-  "version": "1.0.2",
-  "description": "Zero-dependency JavaScript charts for finance and risk: exposure heatmap, risk-factor tornado and P&L attribution.",
+  "version": "1.1.0",
+  "description": "Zero-dependency JavaScript charts for finance and risk: exposure heatmap, risk-factor tornado, P&L attribution and debt maturity ladder.",
   "keywords": [
     "charts",
     "data-visualization",
@@ -15,7 +15,9 @@
     "frtb",
     "svg",
     "zero-dependency",
-    "accessible"
+    "accessible",
+    "debt-maturity",
+    "treasury"
   ],
   "homepage": "https://veyforma.github.io/veyforma-charts/examples/",
   "repository": {

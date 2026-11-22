@@ -8,7 +8,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
-const CHARTS = ["veyforma-heatmap.js", "veyforma-tornado.js", "veyforma-pla.js"];
+const CHARTS = ["veyforma-heatmap.js", "veyforma-tornado.js", "veyforma-pla.js", "veyforma-debtladder.js"];
 const PARTS = [...CHARTS, "veyforma-charts.js"];
 const ROOT_ARG = '(typeof window !== "undefined" ? window : this)';
 const banner = `/*! @veyforma/charts v${pkg.version} · MIT License · Copyright (c) 2026 Veyforma · https://github.com/veyforma/veyforma-charts */\n`;
@@ -28,7 +28,7 @@ writeFileSync("dist/veyforma-charts.js", banner + src.join("\n"));
 const moduleBody = (src) =>
   "var __vfRoot = typeof window !== \"undefined\" ? window : {};\n" +
   src.map((s) => s.replace(ROOT_ARG, "(__vfRoot)")).join("\n") + "\n";
-const names = ["VeyformaCharts", "VeyHeatmap", "VeyRiskTornado", "VeyPlaAttribution"];
+const names = ["VeyformaCharts", "VeyHeatmap", "VeyRiskTornado", "VeyPlaAttribution", "VeyDebtLadder"];
 writeFileSync("dist/veyforma-charts.mjs", banner + moduleBody(src) +
   names.map((n) => `export const ${n} = __vfRoot.${n};`).join("\n") +
   "\nexport default __vfRoot.VeyformaCharts;\n");

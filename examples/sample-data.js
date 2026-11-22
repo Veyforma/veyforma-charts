@@ -139,5 +139,40 @@
     ])
   };
 
-  root.VeyformaSamples = { heatmap: heatmap, loanRecords: loanRecords, tornado: tornado, pla: pla };
+  /* ------------------------------------------------------------------
+     4. Debt maturity ladder: a fictional logistics group.
+     ------------------------------------------------------------------ */
+  // Equal instalments every `months` months from `first` to `last` (inclusive).
+  function instalments(first, last, months, amount) {
+    var out = [], d = new Date(first + "T00:00:00Z"), end = new Date(last + "T00:00:00Z");
+    while (d <= end) {
+      out.push({ date: d.toISOString().slice(0, 10), amount: amount });
+      d = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + months + 1, 0));
+    }
+    return out;
+  }
+  var debtLadder = {
+    title: "Aldermoor Logistics – debt maturities",
+    subtitle: "Bonds, term loans and the revolver",
+    company: "Aldermoor Logistics (fictional)",
+    asOf: "2026-10-31", unit: "EUR m", prefix: "€", suffix: "m", decimals: 0,
+    source: "Illustrative sample data",
+    cash: 120, cashFlow: 55,
+    refinanceRate: { "Bond": 0.0475, "Term loan": 0.056, "Revolver": 0.05, "default": 0.052 },
+    facilities: [
+      { name: "Commercial paper", type: "Commercial paper", amount: 60, maturity: "2027-01-29", coupon: 0.034, rateType: "Floating" },
+      { name: "Term loan A", type: "Term loan", amount: 180, maturity: "2028-03-31", coupon: 0.047, rateType: "Floating", lender: "Bank syndicate",
+        amortisation: instalments("2026-12-31", "2027-12-31", 3, 10) },
+      { name: "Bond 2028", type: "Bond", amount: 350, maturity: "2028-06-15", coupon: 0.01625, rateType: "Fixed" },
+      { name: "Fleet financing", type: "Lease", amount: 70, maturity: "2030-12-31", coupon: 0.051, rateType: "Fixed",
+        amortisation: instalments("2027-06-30", "2030-06-30", 6, 7) },
+      { name: "Revolver (€300m)", type: "Revolver", amount: 45, limit: 300, maturity: "2029-09-30", coupon: 0.045, rateType: "Floating",
+        lender: "Club of 5 banks", extension: { years: 1 } },
+      { name: "Schuldschein 2029", type: "Private placement", amount: 90, maturity: "2029-11-15", coupon: 0.0285, rateType: "Fixed" },
+      { name: "Green bond 2031", type: "Bond", amount: 300, maturity: "2031-04-10", coupon: 0.03375, rateType: "Fixed" },
+      { name: "Bond 2034", type: "Bond", amount: 250, maturity: "2034-09-22", coupon: 0.04125, rateType: "Fixed" }
+    ]
+  };
+
+  root.VeyformaSamples = { heatmap: heatmap, loanRecords: loanRecords, tornado: tornado, pla: pla, debtLadder: debtLadder };
 })(typeof window !== "undefined" ? window : this);
