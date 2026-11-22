@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 – 2026-11-22
+
+- npm homepage now opens the live demos
+- Releases are published from GitHub Actions with npm trusted publishing
+
 ## 1.0.0 – 2026-11-22
 
 First public release.

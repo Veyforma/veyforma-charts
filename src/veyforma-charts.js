@@ -15,7 +15,7 @@
   }
 
   root.VeyformaCharts = {
-    version: "1.0.0",
+    version: "1.0.1",
     /** Exposure heatmap: concentrations by any two fields, e.g. sector × country. */
     heatmap: function (target, options) { return need("VeyHeatmap").create(target, options); },
     /** Risk-factor tornado: down and up impact per factor, with convexity, limits and hedges. */

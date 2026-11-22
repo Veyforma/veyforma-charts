@@ -1,5 +1,7 @@
-# Publishes @veyforma/charts to npm when a GitHub Release is published.
+# Stages @veyforma/charts on npm when a GitHub Release is published.
 # Uses npm trusted publishing (OIDC): no npm token or 2FA code is stored anywhere.
+# The staged version goes public after a maintainer approves it on npmjs.com
+# (profile → Staged Packages → Approve) with 2FA.
 # Set up once on npmjs.com: package Settings → Trusted Publisher → GitHub Actions
 #   user: Veyforma · repository: veyforma-charts · workflow: publish.yml
 name: Publish to npm
@@ -37,5 +39,7 @@ jobs:
 
       - run: npm install
 
-      # prepublishOnly runs the build, so dist/ is always fresh
-      - run: npm publish --access public
+      - run: npm run build
+
+      # Staged, not public yet: approve it on npmjs.com
+      - run: npm stage publish
