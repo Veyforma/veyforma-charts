@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exposure Accumulation Map – Veyforma Charts</title>
+<meta name="description" content="Zero-dependency JavaScript map of exposure accumulation: the insured value one event of a chosen radius would hit, anywhere in the US, against your limit. No map tiles or API keys.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="index.html">veyforma<span>charts</span></a>
+  <nav class="site" aria-label="Charts">
+    <a href="heatmap.html">Heatmap</a>
+    <a href="tornado.html">Tornado</a>
+    <a href="pla-attribution.html">P&amp;L attribution</a>
+    <a href="debt-ladder.html">Debt ladder</a>
+    <a href="accumulation-map.html" aria-current="page">Accumulation map</a>
+    <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
+  </nav>
+</div></header>
+
+<main class="wrap">
+  <h1 class="page">Exposure Accumulation Map</h1>
+  <p class="lead">How much insured value could one event hit? For every point on the map, the chart sums the insured value within the event radius, colours the map by that amount as a share of your limit, and calls out the worst areas by name. Hover anywhere for the exact figure, or click to move the event.</p>
+
+  <section class="card" aria-labelledby="t1">
+    <h2 id="t1">Harbourline Mutual</h2>
+    <p class="sub">Fictional property insurer · 4,000 locations · USD m · Illustrative sample data</p>
+    <div class="controls">
+      <div class="field">
+        <span class="lbl">Map</span>
+        <label class="check"><input type="checkbox" id="relief" checked> Terrain shading</label>
+      </div>
+      <div class="field">
+        <span class="lbl">&nbsp;</span>
+        <label class="check"><input type="checkbox" id="states" checked> State labels</label>
+      </div>
+    </div>
+    <div id="chart"></div>
+    <div class="card-foot">
+      <span class="by">Veyforma Exposure Accumulation Map · MIT · Boundaries: US Census Bureau · Terrain: Natural Earth</span>
+      <span class="links"><a href="https://www.veyforma.com/charts/exposure-accumulation-map">Full package with exports and six portfolios</a></span>
+    </div>
+  </section>
+
+  <h3>The code</h3>
+<pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-accumulation.min.js"&gt;&lt;/script&gt;
+&lt;script src="https://cdn.jsdelivr.net/npm/@veyforma/charts/dist/veyforma-accumulation-usa.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  VeyAccumulation.create("#chart", {
+    data: {
+      basemap: VeyAccumulationMaps.usa,
+      // [longitude, latitude, insured value, perils: 1 wind + 2 flood + 4 earthquake]
+      locations: [[-80.19, 25.77, 120, 3], [-80.12, 26.12, 140, 3], [-95.37, 29.76, 150, 3]],
+      areas: [["Miami", -80.19, 25.76], ["Houston", -95.37, 29.76]]
+    },
+    limit: 2000,   // accumulation limit, same unit as the values
+    radius: 100    // event radius in km
+  });
+&lt;/script&gt;</code></pre>
+</main>
+
+<footer class="site"><div class="wrap">
+  <span>All figures are fictional.</span>
+  <span>Made by <a href="https://www.veyforma.com">Veyforma</a> · MIT License</span>
+</div></footer>
+
+<script src="../dist/veyforma-charts.js"></script>
+<script src="../dist/veyforma-accumulation-usa.js"></script>
+<script src="../dist/veyforma-accumulation-relief.js"></script>
+<script src="sample-data.js"></script>
+<script>
+  var data = Object.assign({}, VeyformaSamples.accumulation, { basemap: VeyAccumulationMaps.usa, relief: VeyAccumulationRelief.usa });
+  var chart = VeyAccumulation.create("#chart", { data: data, limit: 2000, radius: 100, toolbar: false });
+  document.getElementById("relief").addEventListener("change", function () { chart.setOptions({ relief: this.checked }); });
+  document.getElementById("states").addEventListener("change", function () { chart.setOptions({ stateLabels: this.checked }); });
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Veyforma Charts – zero-dependency JavaScript charts for finance and risk</title>
-<meta name="description" content="Free, MIT-licensed JavaScript charts for finance and risk teams: exposure heatmap, risk-factor tornado, FRTB P&L attribution and debt maturity ladder. No dependencies, accessible, no build step.">
+<meta name="description" content="Free, MIT-licensed JavaScript charts for finance and risk teams: exposure heatmap, risk-factor tornado, FRTB P&L attribution, debt maturity ladder and exposure accumulation map. No dependencies, accessible, no build step.">
 <meta property="og:title" content="Veyforma Charts">
 <meta property="og:description" content="Zero-dependency JavaScript charts for finance and risk teams.">
 <meta property="og:image" content="https://veyforma.github.io/veyforma-charts/docs/hero.png">
@@ -18,6 +18,7 @@
     <a href="tornado.html">Tornado</a>
     <a href="pla-attribution.html">P&amp;L attribution</a>
     <a href="debt-ladder.html">Debt ladder</a>
+    <a href="accumulation-map.html">Accumulation map</a>
     <a href="https://github.com/veyforma/veyforma-charts">GitHub</a>
   </nav>
 </div></header>
@@ -25,7 +26,7 @@
 <main class="wrap">
   <section class="hero">
     <h1>Charts for the questions risk teams actually ask</h1>
-    <p>Where is exposure concentrated? Which risk factors move P&amp;L? Why doesn't the risk model's P&amp;L match the front office's? When does our debt fall due? Free charts that answer these questions, in plain JavaScript.</p>
+    <p>Where is exposure concentrated? Which risk factors move P&amp;L? Why doesn't the risk model's P&amp;L match the front office's? When does our debt fall due? How much could one event hit? Free charts that answer these questions, in plain JavaScript.</p>
     <ul class="pills">
       <li>No dependencies</li><li>MIT license</li><li>No build step</li><li>Keyboard and screen reader</li><li>Nothing sent to a server</li>
     </ul>
@@ -61,6 +62,13 @@
     <div class="card-foot"><span class="by">VeyDebtLadder.create(el, options)</span><span class="links"><a href="debt-ladder.html">Interactive demo</a></span></div>
   </section>
 
+  <section class="card" aria-labelledby="h-acc">
+    <h2 id="h-acc">Exposure Accumulation Map</h2>
+    <p class="sub">The insured value one event could hit, anywhere on the map, against your limit.</p>
+    <div id="acc"></div>
+    <div class="card-foot"><span class="by">VeyAccumulation.create(el, options)</span><span class="links"><a href="accumulation-map.html">Interactive demo</a></span></div>
+  </section>
+
   <aside class="more">
     <p><strong>Need more?</strong> The full packages on Veyforma add a chart menu with PNG, SVG, PDF, CSV and Excel downloads, more sample data and a developer manual. Veyforma also has more risk and finance charts and complete dashboard prototypes.</p>
     <a class="cta" href="https://www.veyforma.com">Visit veyforma.com</a>
@@ -73,6 +81,7 @@
 </div></footer>
 
 <script src="../dist/veyforma-charts.js"></script>
+<script src="../dist/veyforma-accumulation-usa.js"></script>
 <script src="sample-data.js"></script>
 <script>
   var S = window.VeyformaSamples;
@@ -80,6 +89,7 @@
   VeyformaCharts.tornado("#tor", { data: S.tornado, toolbar: false, top: 10 });
   VeyformaCharts.plaAttribution("#pla", { data: S.pla, toolbar: false });
   VeyformaCharts.debtLadder("#dl", { data: S.debtLadder, toolbar: false });
+  VeyformaCharts.accumulationMap("#acc", { data: Object.assign({}, S.accumulation, { basemap: VeyAccumulationMaps.usa }), limit: 2000, radius: 100, toolbar: false });
 </script>
 </body>
 </html>

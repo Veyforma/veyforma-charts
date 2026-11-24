@@ -3,12 +3,12 @@
 **Zero-dependency JavaScript charts for finance and risk teams.** Accessible, readable enough to edit, and nothing is sent to a server.
 
 [![npm](https://img.shields.io/npm/v/@veyforma/charts)](https://www.npmjs.com/package/@veyforma/charts)
-[![gzip size](https://img.shields.io/badge/gzip-61%20KB%20all%20four-informational)](dist/)
+[![gzip size](https://img.shields.io/badge/gzip-80%20KB%20all%20five-informational)](dist/)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [![Exposure heatmap and risk-factor tornado](docs/hero.png)](https://veyforma.github.io/veyforma-charts/examples/)
 
-General charting libraries give you bars and lines. Risk and finance teams need charts built around the questions they actually ask: *where is credit exposure concentrated?*, *which risk factors move P&L?*, *why doesn't the risk model's P&L match the front office's?*, *when does our debt fall due, and can we cover it?* This package answers those questions, in plain JavaScript, with no build step.
+General charting libraries give you bars and lines. Risk and finance teams need charts built around the questions they actually ask: *where is credit exposure concentrated?*, *which risk factors move P&L?*, *why doesn't the risk model's P&L match the front office's?*, *when does our debt fall due, and can we cover it?*, *how much insured value could one event hit?* This package answers those questions, in plain JavaScript, with no build step.
 
 **[See the live demos →](https://veyforma.github.io/veyforma-charts/examples/)**
 
@@ -20,6 +20,7 @@ General charting libraries give you bars and lines. Risk and finance teams need 
 | **Risk-Factor Tornado** | Which risk factors move P&L, economic value or capital the most? Down and up shocks, convexity, loss limits, groups and correlated contributions. | 15.3 KB | [Live](https://veyforma.github.io/veyforma-charts/examples/tornado.html) |
 | **P&L Attribution** | Does the desk pass the FRTB P&L attribution test? HPL vs RTPL by factor, Spearman and KS zones, and the shortest path of fixes back to green. | 15.3 KB | [Live](https://veyforma.github.io/veyforma-charts/examples/pla-attribution.html) |
 | **Debt Maturity Ladder** | When does our debt fall due, and can we cover it? Maturities by year or quarter, refinancing walls, start-by dates, liquidity cover and weighted average maturity. | 19.4 KB | [Live](https://veyforma.github.io/veyforma-charts/examples/debt-ladder.html) |
+| **Exposure Accumulation Map** | How much insured value could one event hit? Sums the value within an event radius at every point of a US map, compares it with your limit and names the worst areas. No map tiles or API keys. | 19.0 KB + map | [Live](https://veyforma.github.io/veyforma-charts/examples/accumulation-map.html) |
 
 Every chart has keyboard-usable controls, tooltips on hover, tap and focus, a screen-reader description, and a built-in "How to read this chart" note.
 
@@ -194,6 +195,41 @@ VeyDebtLadder.create("#chart", {
 | `coverTarget` | `1.2` | Target for liquidity sources ÷ maturities over the next 12 months |
 
 `VeyDebtLadder.compute(data, opts)` returns every figure without drawing, and also runs in Node.
+
+### Exposure Accumulation Map: `VeyAccumulation.create(el, options)`
+
+Load the US basemap too (`dist/veyforma-accumulation-usa.js`, 60 KB gzipped). Terrain shading is optional (`dist/veyforma-accumulation-relief.js`). Neither is in the combined bundle, so pages without a map don't download them.
+
+Each location is `[longitude, latitude, insured value, perils]`, with perils as bits (1 windstorm, 2 flood, 4 earthquake), or an object with `perils: ["wind", "flood"]`. Add `areas` as `[name, lon, lat]` to name the worst spots.
+
+```js
+VeyAccumulation.create("#chart", {
+  data: {
+    basemap: VeyAccumulationMaps.usa,
+    relief: VeyAccumulationRelief.usa,            // optional terrain shading
+    locations: [[-80.19, 25.77, 120, 3], [-80.12, 26.12, 140, 3], [-95.37, 29.76, 150, 3]],
+    areas: [["Miami", -80.19, 25.76], ["Houston", -95.37, 29.76]]
+  },
+  limit: 2000,
+  radius: 100
+});
+```
+
+With a bundler, the map data is an ES module: `import usa from "@veyforma/charts/dist/veyforma-accumulation-usa.mjs"`.
+
+| Option | Default | What it does |
+|---|---|---|
+| `radius` | `100` | Event radius in km; `radii` sets the choices in the control bar |
+| `limit` | none | Accumulation limit; `limits` sets the choices |
+| `peril` | `"all"` | `"all"`, `"wind"`, `"flood"` or `"quake"` |
+| `currency`, `unit` | `"$"`, `"m"` | How values are written |
+| `callouts` | `2` | How many of the worst areas to label on the map |
+| `relief`, `stateLabels` | `true` | Terrain shading and state names |
+| `controls` | `true` | The peril, radius and limit bar on the map |
+
+Every figure is the exact sum of insured values within the great-circle distance of the event centre; the coloured bands are a smoothed picture of the same calculation. `VeyAccumulation.compute(data, opts)` returns the surface and the worst areas without drawing, and also runs in Node.
+
+Map data: state boundaries from the US Census Bureau and shaded relief from Natural Earth, both in the public domain.
 
 ### Shared methods
 

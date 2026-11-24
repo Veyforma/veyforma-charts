@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 – 2026-11-24
+
+- New chart: Exposure Accumulation Map (engine v1.0.0), with a live demo
+- `VeyformaCharts.accumulationMap(el, options)`
+- US basemap (US Census Bureau boundaries, public domain) and optional terrain shading (Natural Earth, public domain) as separate files, each also as an ES module
+
 ## 1.1.0 – 2026-11-22
 
 - New chart: Debt Maturity Ladder (engine v1.0.0), with a live demo

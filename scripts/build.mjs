@@ -8,7 +8,12 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const pkg = JSON.parse(readFileSync("package.json", "utf8"));
-const CHARTS = ["veyforma-heatmap.js", "veyforma-tornado.js", "veyforma-pla.js", "veyforma-debtladder.js"];
+const CHARTS = ["veyforma-heatmap.js", "veyforma-tornado.js", "veyforma-pla.js", "veyforma-debtladder.js", "veyforma-accumulation.js"];
+// Map data: shipped as separate files (not in the bundle) because they are large and optional.
+const MAP_DATA = [
+  { file: "veyforma-accumulation-usa.js", global: "VeyAccumulationMaps", key: "usa" },
+  { file: "veyforma-accumulation-relief.js", global: "VeyAccumulationRelief", key: "usa" }
+];
 const PARTS = [...CHARTS, "veyforma-charts.js"];
 const ROOT_ARG = '(typeof window !== "undefined" ? window : this)';
 const banner = `/*! @veyforma/charts v${pkg.version} · MIT License · Copyright (c) 2026 Veyforma · https://github.com/veyforma/veyforma-charts */\n`;
@@ -28,7 +33,7 @@ writeFileSync("dist/veyforma-charts.js", banner + src.join("\n"));
 const moduleBody = (src) =>
   "var __vfRoot = typeof window !== \"undefined\" ? window : {};\n" +
   src.map((s) => s.replace(ROOT_ARG, "(__vfRoot)")).join("\n") + "\n";
-const names = ["VeyformaCharts", "VeyHeatmap", "VeyRiskTornado", "VeyPlaAttribution", "VeyDebtLadder"];
+const names = ["VeyformaCharts", "VeyHeatmap", "VeyRiskTornado", "VeyPlaAttribution", "VeyDebtLadder", "VeyAccumulation"];
 writeFileSync("dist/veyforma-charts.mjs", banner + moduleBody(src) +
   names.map((n) => `export const ${n} = __vfRoot.${n};`).join("\n") +
   "\nexport default __vfRoot.VeyformaCharts;\n");
@@ -38,6 +43,16 @@ writeFileSync("dist/veyforma-charts.cjs", banner + moduleBody(src) +
 
 // 3. Each chart on its own.
 for (const f of CHARTS) copyFileSync(`src/${f}`, `dist/${f}`);
+
+// 3b. Map data: a plain <script> copy, and an ES module whose default export is the data.
+for (const m of MAP_DATA) {
+  const s = readFileSync(`src/${m.file}`, "utf8");
+  if (s.split(ROOT_ARG).length !== 2) throw new Error(`${m.file}: expected exactly one ${ROOT_ARG}`);
+  copyFileSync(`src/${m.file}`, `dist/${m.file}`);
+  writeFileSync(`dist/${m.file.replace(/\.js$/, ".mjs")}`,
+    "var __vfRoot = typeof window !== \"undefined\" ? window : {};\n" + s.replace(ROOT_ARG, "(__vfRoot)") +
+    `\nexport default __vfRoot.${m.global}.${m.key};\n`);
+}
 
 // 4. Minified bundle, if esbuild is available.
 try {
